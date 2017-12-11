@@ -3,14 +3,6 @@
 #include <string.h>
 #include <math.h>
 
-int Max(int x, int y) {
-	if (x > y) {
-		return x;
-	} else {
-		return y;
-	}
-} 
-
 #define MAXCHAR 100000
 #define MAXWORDS 10000
  
@@ -41,24 +33,7 @@ int LineToWordArray(char **WordArray, char *Line) {
 	return WordIndex;
 }
 
-void BubbleSort(char *List) {
-	int L = strlen(List);
-	int Ordered = 1;
-	int Done = 0;
-	while (!Done) {
-		Done = 1;
-		for (int i = 0; i < L-1; i++) {
-			if (List[i] > List[i+1]) {
-				char Temp = List[i];
-				List[i] = List[i+1];
-				List[i+1] = Temp;
-				Done = 0;
-			} 
-		}
-	}
-}
-
-int sign(int x) {
+int Sign(int x) {
 	if (x > 0) return 1;
 	if (x < 0) return -1;
 	return 0;
@@ -70,37 +45,12 @@ typedef struct _v3i {
 	int z;
 } v3i;
 
-int HexDistance(int a, int b, int c, int *oa, int *ob, int *oc) {
-	// First get rid of the linear dependence by eliminating c using c = b-a.
-	a -= c; 
-	b += c;
-	c -= c;
-
-	// Now, if both a and b have the same sign, this is the decomposition with the miniumum hex distance,
-	if (sign(a) == sign(b)) {
-		*oa = a; *ob = b; *oc = c;
-	} else if (abs(a) >= abs(b)) {
-		// a is the longer part, so we can convert all of the bs into cs using b = a + c
-		a += b; 
-		c += b; 
-		b -= c;
-		*oa = a; *ob = b; *oc = c;
-	} else {
-		// b is the longer part, so convert all of the as into cs using a = b-c
-		b += a;
-		c -= a;
-		a -= a;
-		*oa = a; *ob = b; *oc = c;
-	}
-	return (abs(a)+abs(b)+abs(c));
-}
-
 v3i OptimalPath(v3i V) {
 	// First get rid of the linear dependence by eliminating c using c = b-a.
 	v3i VOpt = {V.x-V.z, V.y+V.z, 0};
 
 	// Now, if both a and b have the same sign, this is the decomposition with the miniumum hex distance,
-	if (sign(VOpt.x) == sign(VOpt.y)) {
+	if (Sign(VOpt.x) == Sign(VOpt.y)) {
 
 	} else if (abs(V.x) >= abs(V.y)) {
 		// a is the longer part, so we can convert all of the bs into cs using b = a + c
@@ -123,21 +73,15 @@ int OneNormi(v3i V) {
 int main(int argc, char const *argv[]) 
 {
 	FILE *FilePointer = fopen("./Day11_input.txt", "r");
+	if (FilePointer == NULL) { printf("Cannot open file!\n"); return -1; }
 	char *Line = (char *)malloc(MAXCHAR);
 	size_t Count; ssize_t nread;
-	if (FilePointer == NULL) { printf("Cannot open file!\n"); return -1; }
 
 	char *WordArray[MAXWORDS];
 
-	int NumValid = 0;
 	if ((nread = getline(&Line, &Count, FilePointer)) != -1) {
-		sprintf(Line, "ne,ne,sw,sw");
+		// sprintf(Line, "ne,ne,sw,sw"); // Test case
 		int NumWords = LineToWordArray(WordArray, Line);
-
-		for (int i = 0; i < NumWords; i++) {
-			printf("%s,", WordArray[i]);
-		}
-		printf("\n");
 		printf("We read %d words!\n", NumWords);
 
 		v3i RawPath = {0,0,0};
@@ -158,18 +102,17 @@ int main(int argc, char const *argv[])
 				RawPath.z--;
 			} else {
 				printf("Error! unrecognised input \"%s\"\n", WordArray[i]);
-				int *NP = 0;
-				*NP = 1;
+				return -1;
 			}
 			int Dist = OneNormi(OptimalPath(RawPath));
 			if (Dist > MaxDist) {
 				MaxDist = Dist;
 			}
 		}
-		printf("a = %d, b = %d, c = %d\n", RawPath.x, RawPath.y, RawPath.z);
+		printf("x = %d, y = %d, z = %d\n", RawPath.x, RawPath.y, RawPath.z);
 		v3i OptPath = OptimalPath(RawPath);
-		printf("Distance (Vec) = %d, oa = %d, ob = %d, oc = %d\n", OneNormi(OptPath), OptPath.x, OptPath.y, OptPath.z);
-		printf("Max Dist = %d\n", MaxDist);
+		printf("Distance (Vec) = %d, ox = %d, oy = %d, oz = %d\n", OneNormi(OptPath), OptPath.x, OptPath.y, OptPath.z);
+		printf("Max Distance = %d\n", MaxDist);
 	}
 	return 0;
 }
