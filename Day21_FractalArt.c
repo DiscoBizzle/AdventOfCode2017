@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <time.h> 
 
 #define MAXCHAR 100
 #define MAXWORDS 300
@@ -72,72 +73,23 @@ void AddWordArrayToDictionary2(char **Dictionary, int *OnCount, char **WordArray
 	int NumOn = CountCharInString('#', Dictionary[Hash]);
 	OnCount[Hash] = NumOn;
 
+	int Permutation[7][4] = {{1, 0, 3, 2}, // Hor flip
+						  {2, 0, 3, 1},    // Rot 90 
+						  {0, 2, 1, 3},    // Rot 90 Hor flip
+						  {3, 2, 1, 0},    // Rot 180 
+						  {2, 3, 0, 1},	   // Rot 180 Hor flip
+						  {1, 3, 0, 2},    // Rot 270 
+						  {3, 1, 2, 0}};   // Rot 270 Hor flip
+
 	// Now perform all rotations and flips and generate the hashes for those.
 	char *PString = (char *)calloc(10, sizeof(char));
-	/* 1 0      hor flip
-	   3 2 
-	   2143 */
-	int Flip[4] = {1, 0, 3, 2};
-	PermuteString(PString, String, Flip);
-	// printf("PString = %s\n", PString);
-	Hash = BinaryStringToInt32('.', '#', PString);
-	Dictionary[Hash] = (char *)calloc(10, sizeof(char));
-	sprintf(Dictionary[Hash], "%s%s%s", WordArray[3], WordArray[4], WordArray[5]);
-	OnCount[Hash] = NumOn;
-
-	/* 2 0     rot 90 
-	   3 1 */
-	int Rot[4] = {2, 0, 3, 1};
-	PermuteString(PString, String, Rot);
-	Hash = BinaryStringToInt32('.', '#', PString);
-	Dictionary[Hash] = (char *)calloc(10, sizeof(char));
-	sprintf(Dictionary[Hash], "%s%s%s", WordArray[3], WordArray[4], WordArray[5]);
-	OnCount[Hash] = NumOn;
-
-	/* 0 2     rot 90 hor flip
-	   1 3 */
-	int RotFlip[4] = {0, 2, 1, 3};
-	PermuteString(PString, String, RotFlip);
-	Hash = BinaryStringToInt32('.', '#', PString);
-	Dictionary[Hash] = (char *)calloc(10, sizeof(char));
-	sprintf(Dictionary[Hash], "%s%s%s", WordArray[3], WordArray[4], WordArray[5]);
-	OnCount[Hash] = NumOn;
-
-	/* 3 2     rot 180 
-	   1 0 */
-	int RotRot[4] = {3, 2, 1, 0};
-	PermuteString(PString, String, RotRot);
-	Hash = BinaryStringToInt32('.', '#', PString);
-	Dictionary[Hash] = (char *)calloc(10, sizeof(char));
-	sprintf(Dictionary[Hash], "%s%s%s", WordArray[3], WordArray[4], WordArray[5]);
-	OnCount[Hash] = NumOn;
-
-	/* 2 3     rot 180 hor flip
-	   0 1 */
-	int RotRotFlip[4] = {2, 3, 0, 1};
-	PermuteString(PString, String, RotRotFlip);
-	Hash = BinaryStringToInt32('.', '#', PString);
-	Dictionary[Hash] = (char *)calloc(10, sizeof(char));
-	sprintf(Dictionary[Hash], "%s%s%s", WordArray[3], WordArray[4], WordArray[5]);
-	OnCount[Hash] = NumOn;
-
-	/* 1 3     rot 270
-	   0 2*/
-	int RotRotRot[4] = {1, 3, 0, 2};
-	PermuteString(PString, String, RotRotRot);
-	Hash = BinaryStringToInt32('.', '#', PString);
-	Dictionary[Hash] = (char *)calloc(10, sizeof(char));
-	sprintf(Dictionary[Hash], "%s%s%s", WordArray[3], WordArray[4], WordArray[5]);
-	OnCount[Hash] = NumOn;
-
-	/* 3 1     rot 270 hor flip
-	   2 0 */
-	int RotRotRotFlip[4] = {3, 1, 2, 0};
-	PermuteString(PString, String, RotRotRotFlip);
-	Hash = BinaryStringToInt32('.', '#', PString);
-	Dictionary[Hash] = (char *)calloc(10, sizeof(char));
-	sprintf(Dictionary[Hash], "%s%s%s", WordArray[3], WordArray[4], WordArray[5]);
-	OnCount[Hash] = NumOn;
+	for (int i = 0; i < 7; i++) {
+		PermuteString(PString, String, Permutation[i]);
+		Hash = BinaryStringToInt32('.', '#', PString);
+		Dictionary[Hash] = (char *)calloc(10, sizeof(char));
+		sprintf(Dictionary[Hash], "%s%s%s", WordArray[3], WordArray[4], WordArray[5]);
+		OnCount[Hash] = NumOn;
+	}
 }
 
 void AddWordArrayToDictionary3(char **Dictionary, int *OnCount, char **WordArray)
@@ -158,77 +110,22 @@ void AddWordArrayToDictionary3(char **Dictionary, int *OnCount, char **WordArray
 
 	// Now perform all rotations and flips and generate the hashes for those.
 	char *PString = (char *)calloc(17, sizeof(char));
-	/* 2 1 0      hor flip
-	   5 4 3
-	   8 7 6 
-	   2143 */
-	int Flip[9] = {2, 1, 0, 5, 4, 3, 8, 7, 6};
-	PermuteString(PString, String, Flip);
-	// printf("PString = %s\n", PString);
-	Hash = BinaryStringToInt32('.', '#', PString);
-	Dictionary[Hash] = (char *)calloc(17, sizeof(char));
-	sprintf(Dictionary[Hash], "%s%s%s%s", WordArray[4], WordArray[5], WordArray[6], WordArray[7]);
-	OnCount[Hash] = NumOn;
 
-	/* 6 3 0     rot 90 
-	   7 4 1
-	   8 5 2 */
-	int Rot[9] = {6, 3, 0, 7, 4 ,1, 8, 5, 2};
-	PermuteString(PString, String, Rot);
-	Hash = BinaryStringToInt32('.', '#', PString);
-	Dictionary[Hash] = (char *)calloc(17, sizeof(char));
-	sprintf(Dictionary[Hash], "%s%s%s%s", WordArray[4], WordArray[5], WordArray[6], WordArray[7]);
-	OnCount[Hash] = NumOn;
+	int Permutation[7][9] = {{2, 1, 0, 5, 4, 3, 8, 7, 6}, // Hor flip
+					  		 {6, 3, 0, 7, 4 ,1, 8, 5, 2},    // Rot 90 
+					  		 {0, 3, 6, 1, 4, 7, 2, 5, 8},    // Rot 90 Hor flip
+					  		 {8, 7, 6, 5, 4, 3, 2, 1, 0},    // Rot 180 
+					  		 {6, 7, 8, 3, 4, 5, 0, 1, 2},	   // Rot 180 Hor flip
+					  		 {2, 5, 8, 1, 4, 7, 0, 3, 6},    // Rot 270 
+					  		 {8, 5, 2, 7, 4, 1, 6, 3, 0}};   // Rot 270 Hor flip
 
-	/* 0 3 6    rot 90 hor flip
-	   1 4 7
-	   2 5 8 */
-	int RotFlip[9] = {0, 3, 6, 1, 4, 7, 2, 5, 8};
-	PermuteString(PString, String, RotFlip);
-	Hash = BinaryStringToInt32('.', '#', PString);
-	Dictionary[Hash] = (char *)calloc(17, sizeof(char));
-	sprintf(Dictionary[Hash], "%s%s%s%s", WordArray[4], WordArray[5], WordArray[6], WordArray[7]);
-	OnCount[Hash] = NumOn;
-
-	/* 8 7 6     rot 180 
-	   5 4 3
-	   2 1 0 */
-	int RotRot[9] = {8, 7, 6, 5, 4, 3, 2, 1, 0};
-	PermuteString(PString, String, RotRot);
-	Hash = BinaryStringToInt32('.', '#', PString);
-	Dictionary[Hash] = (char *)calloc(17, sizeof(char));
-	sprintf(Dictionary[Hash], "%s%s%s%s", WordArray[4], WordArray[5], WordArray[6], WordArray[7]);
-	OnCount[Hash] = NumOn;
-
-	/* 6 7 8     rot 180 hor flip
-	   3 4 5 
-	   0 1 2 */
-	int RotRotFlip[9] = {6, 7, 8, 3, 4, 5, 0, 1, 2};
-	PermuteString(PString, String, RotRotFlip);
-	Hash = BinaryStringToInt32('.', '#', PString);
-	Dictionary[Hash] = (char *)calloc(17, sizeof(char));
-	sprintf(Dictionary[Hash], "%s%s%s%s", WordArray[4], WordArray[5], WordArray[6], WordArray[7]);
-	OnCount[Hash] = NumOn;
-
-	/* 2 5 8     rot 270
-	   1 4 7 
-	   0 3 6 */
-	int RotRotRot[9] = {2, 5, 8, 1, 4, 7, 0, 3, 6};
-	PermuteString(PString, String, RotRotRot);
-	Hash = BinaryStringToInt32('.', '#', PString);
-	Dictionary[Hash] = (char *)calloc(17, sizeof(char));
-	sprintf(Dictionary[Hash], "%s%s%s%s", WordArray[4], WordArray[5], WordArray[6], WordArray[7]);
-	OnCount[Hash] = NumOn;
-
-	/* 8 5 2     rot 270 hor flip
-	   7 4 1 
-	   6 3 0 */
-	int RotRotRotFlip[9] = {8, 5, 2, 7, 4, 1, 6, 3, 0};
-	PermuteString(PString, String, RotRotRotFlip);
-	Hash = BinaryStringToInt32('.', '#', PString);
-	Dictionary[Hash] = (char *)calloc(17, sizeof(char));
-	sprintf(Dictionary[Hash], "%s%s%s%s", WordArray[4], WordArray[5], WordArray[6], WordArray[7]);
-	OnCount[Hash] = NumOn;
+	for (int i = 0; i < 7; i++) {
+		PermuteString(PString, String, Permutation[i]);
+		Hash = BinaryStringToInt32('.', '#', PString);
+		Dictionary[Hash] = (char *)calloc(17, sizeof(char));
+		sprintf(Dictionary[Hash], "%s%s%s%s", WordArray[4], WordArray[5], WordArray[6], WordArray[7]);
+		OnCount[Hash] = NumOn;
+	}
 }
 
 void PrintGrid(char *Block, int W, int H)
@@ -243,6 +140,9 @@ void PrintGrid(char *Block, int W, int H)
 
 int main(int argc, char const *argv[]) 
 {
+	clock_t t; 
+	t = clock();
+
 	FILE *FilePointer = fopen("./Day21_input.txt", "r");
 	char *Line = (char *)malloc(MAXCHAR);
 	size_t Count; ssize_t nread;
@@ -251,17 +151,15 @@ int main(int argc, char const *argv[])
 	char *WordArray[MAXWORDS];
 
 	// NOTE: First we will read in the rules, generate the rotations and reflections, 
-	// and then hash them by converting the 4-bit or 9-bit binary number.
+	// and then hash them by converting the 4-bit or 9-bit binary number to a decimal interger.
 	int LineIndex = 0;
-	char *Dictionary2[16]; // Number of possible combinations for 2x2 blocks is 2^(4) = 16 
+	char *Dictionary2[16];  // Number of possible combinations for 2x2 blocks is 2^(4) = 16 
 	int OnCount2[16] = {0};
 	char *Dictionary3[512]; // Number of possible combinations for 3x3 blocks is 2^(9) = 512
 	int OnCount3[512] = {0};
 
 	while ((nread = getline(&Line, &Count, FilePointer)) != -1) {
 		int NumWords = LineToWordArrayChooseSplit(WordArray, Line, " /", 2);
-		// printf("LineIndex = %d\n", LineIndex);
-		// PrintWordArray(WordArray, NumWords);
 		if (LineIndex < 6) {
 			AddWordArrayToDictionary2(Dictionary2, OnCount2, WordArray);
 		} else {
@@ -270,13 +168,6 @@ int main(int argc, char const *argv[])
 
 		LineIndex++;
 	}
-
-	// for (int i = 0; i < 16; i++) {
-	// 	printf("Dictionary2[%d] = %s \t OnCount2[%d] = %d\n", i, Dictionary2[i], i, OnCount2[i]);
-	// }
-	// for (int i = 0; i < 512; i++) {
-	// 	printf("Dictionary3[%d] = %s \t OnCount3[%d] = %d\n", i, Dictionary3[i], i, OnCount3[i]);
-	// }
 
 	int S = 3; 
 	int nS = 0;
@@ -335,7 +226,7 @@ int main(int argc, char const *argv[])
 				}
 			}
 		}
-		printf("IterationCount = %d \n", IterationCount);
+		printf("IterationCount = %d, nS = %d \n", IterationCount, nS);
 		// PrintGrid(CurrGrid, nS, nS);
 		printf("CurrNumLightsOn = %d\n", CurrNumLightsOn);
 		printf("\n");
@@ -343,5 +234,8 @@ int main(int argc, char const *argv[])
 		PrevGrid = CurrGrid;
 		S = nS;
 	}
+	
+	t = clock()-t;
+	printf ("It took me %lu clicks (%f seconds) for parts 1 and 2.\n", t,((float)t)/CLOCKS_PER_SEC);
 	return 0;
 }
